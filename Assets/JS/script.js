@@ -1,3 +1,6 @@
+// Global variables ------ ------ ------ ------ ------ ------ ------ ------ ------ ------
+var mainContainer = document.getElementById('main-container');
+
 var questions = [
   {
     question: 'What color is the sky?',
@@ -16,27 +19,52 @@ var questions = [
   },
 ];
 
-// Count down timer
-var label = document.querySelector('.timer');
-var timeLeft = 60;
-var timeInterval = setInterval(function () {
-  timeLeft -= 1;
-  label.innerText = timeLeft;
-
-  if (timeLeft == 0) {
-    clearInterval(timeInterval);
-    displayResults();
-  }
-}, 1000);
-
-// ------ ------ ------ ------ ------ ------ ------ ------ ------ ------
-
 var currentQuiz = 0; // Index of the quiz
 var score = 0; // Keeps track of user score
 var optionCounter = 1; // Counter for the button label i.e. (1. Green, 2. Blue, etc)
+var quizActive = false;
+var runOnce = true;
 
+// ------ ------ ------ Timer function
+var label = document.querySelector('.timer');
+var timeLeft = 60;
+
+const startTimer = () => {
+  var timeInterval = setInterval(function () {
+    timeLeft -= 1;
+    label.innerText = timeLeft;
+
+    // If the timer his 0, stop it and displayResults() which is the end game screen
+    if (timeLeft == 0) {
+      clearInterval(timeInterval);
+      displayResults();
+      // The other instance in which we stop the timer involves when the quiz is done AFTER all questions have been answered
+    } else if (!quizActive) {
+      clearInterval(timeInterval);
+    }
+  }, 1000);
+};
 // ------ ------ ------ Load the quiz with the current index and check responses
 function loadQuiz() {
+  // Run the startTimer function ONCE upon loading quiz
+  if (runOnce) {
+    quizActive = true;
+    startTimer();
+    // We run the function again ONLY once the quiz is done, that way we can stop the timer
+    // In the startTimer function, if quizActive == false, it stops the timer
+  } else if (!quizActive) {
+    startTimer();
+  }
+  runOnce = false; // Set to false so we don't re-run the timer function (This causes a decrement at a faster rate)
+
+  var returnContainer = document.createElement('div');
+  returnContainer.classList.add('quiz-container');
+  mainContainer.append(returnContainer);
+  var elements = `<h1 id="question-label"></h1>
+        <ul class="questions"></ul>`;
+  var quizContainer = document.querySelector('.quiz-container');
+  quizContainer.innerHTML = elements;
+
   // For each quiz, display the questions, options and add an event for the current buttons
   const currentQuizData = questions[currentQuiz];
   var questionLabel = document.getElementById('question-label');
@@ -62,11 +90,8 @@ function trackEvent() {
 function checkResponse(response) {
   const correct = () => {
     score++;
-    console.log(true);
   };
-  const incorrect = () => {
-    console.log(false);
-  };
+  const incorrect = () => {};
 
   response == questions[currentQuiz].answer ? correct() : incorrect();
   currentQuiz++;
@@ -77,7 +102,7 @@ function checkResponse(response) {
   };
   const quizFinished = () => {
     displayResults(); // Display end game screen
-    clearInterval(timeInterval); // Stop the timer
+    quizActive = false;
   };
 
   currentQuiz < questions.length ? nextQuestion() : quizFinished();
@@ -103,6 +128,25 @@ function clearOptions() {
   optionCounter = 1; // Reset button label counter
 }
 
+function resetQuiz(mainContainer) {
+  // Remove the end game screen
+  var endGame = document.querySelector('.endgame-container');
+  endGame.remove();
+  // Re-generate the initial quiz element
+  var returnContainer = document.createElement('div');
+  returnContainer.classList.add('quiz-container');
+  mainContainer.append(returnContainer);
+  var elements = `<h1 id="question-label"></h1>
+        <ul class="questions"></ul>`;
+  var quizContainer = document.querySelector('.quiz-container');
+  quizContainer.innerHTML = elements;
+  // Reset all current data
+  currentQuiz = 0; // Index of the quiz
+  score = 0; // Correct answers
+  optionCounter = 1; // For the button label
+  timeLeft = 60; // Reset timer
+  label.innerText = timeLeft;
+}
 // ------ ------ ------ Display the end game result and screen
 function displayResults() {
   // End game screen
@@ -113,8 +157,44 @@ function displayResults() {
   //      - If local storage doesn't exist, add a score of 0 so there's something to compare it with
   //      - If you get stuck on tracking local high score, refer to the robot gladiator project
   // - Allow user to input their initials so we can submit score to local storage
+  var quizContainer = document.querySelector('.quiz-container');
+  quizContainer.remove();
+  var endGame = document.createElement('div');
+  endGame.classList.add('endgame-container');
+  endGame.innerHTML = `
+  <h1>Your score: ${score}</h1>
+  <p>You got ${score} out of ${questions.length} correct! Want to play again?</p> 
+  <button class='btn btn-action' id='yes'>Yes</button>
+  <button class='btn btn-action' id='no'>No</button>
+  `;
+  mainContainer.append(endGame);
 
-  alert(score);
+  var options = document.querySelectorAll('.btn-action');
+  options.forEach((button) => {
+    button.addEventListener('click', (e) => {
+      if (e.target.innerText == 'Yes') {
+        resetQuiz(mainContainer);
+        loadQuiz();
+      } else {
+        mainContainer.innerHTML = `<div id="intro">
+        <h1>Welcome to the quiz!</h1>
+        <button id="start-quiz">Start Quiz</button>
+        </div>`;
+
+        // Return to the original display
+        alert('Done!');
+      }
+    });
+  });
 }
 
-loadQuiz();
+var introEl = document.getElementById('intro');
+var startQuiz = document.getElementById('start-quiz');
+
+// Upon starting the quiz
+startQuiz.addEventListener('click', () => {
+  // Remove intro screen and...
+  introEl.remove();
+  // Start the quiz
+  loadQuiz();
+});
