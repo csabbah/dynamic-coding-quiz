@@ -24,12 +24,12 @@ var questions = [
     answer: 'hot',
   },
   {
-    question: 'Why is my ass haairy?',
+    question: 'Why do i like COD?',
     options: ['boss', 'ok', 'why', 'arab'],
     answer: 'arab',
   },
   {
-    question: 'Is my dick big?',
+    question: 'Am i tranny?',
     options: ['yes', 'no', 'maybe', 'possibly'],
     answer: 'yes',
   },
@@ -49,20 +49,21 @@ var mainPageEl = `<div class="timer hidden">60</div>
       <div id="intro">
       <h1>Welcome to the quiz!</h1>
       <button id="start-quiz">Start Quiz</button>
-      </div>`;
+      </div> 
+      `;
 mainContainer.innerHTML = mainPageEl;
 
 // ------ ------ ------ Timer function
 var timeLeft = 60;
 
 const startTimer = () => {
-  var label = document.querySelector('.timer');
-  label.classList.remove('hidden');
+  var timerEl = document.querySelector('.timer');
+  timerEl.classList.remove('hidden');
 
   var timeInterval = setInterval(function () {
     timeLeft -= 1;
 
-    label.innerText = timeLeft;
+    timerEl.innerText = timeLeft;
 
     // If the timer his 0, stop it and displayResults() which is the end game screen
     if (timeLeft == 0) {
@@ -100,6 +101,7 @@ const loadQuiz = () => {
 // ------ ------ ------ Listen for the clicks on the option buttons and extract their data
 function trackEvent() {
   var buttons = document.querySelectorAll('.option');
+
   buttons.forEach((button) => {
     button.addEventListener('click', (e) => {
       // Extract the data attributes from the button (which is the response itself)
@@ -109,19 +111,64 @@ function trackEvent() {
   });
 }
 
+// Execute this if option picked is correct
+const correct = () => {
+  // Increment score
+  score++;
+  // Add a class of 'correct' to the label so it changes to green temporarily
+  timerEl.classList.add('correct');
+
+  createLabel('Correct!', 'correct');
+};
+// Execute this if option picked is incorrect
+const incorrect = () => {
+  // Deduct 5 seconds from the timer
+  timeLeft -= 5;
+  // Add a class of 'incorrect' to the label so it changes to red temporarily
+  timerEl.classList.add('flashRed');
+
+  createLabel('Incorrect!', 'incorrect');
+};
+
+// ------ ------ ------ This returns the 'Correct' or 'Incorrect' labels upon selecting options
+// This function is being used in checkResponse()
+function createLabel(status, classname) {
+  var element = document.createElement('div');
+  element.classList.add('update-label');
+  element.innerHTML = `<hr />
+      <h1 class="label ${classname}">${status}!</h1>`;
+  mainContainer.append(element);
+}
 // ------ ------ ------ Check result of the user input and determine next course of action
 function checkResponse(response) {
+  var timerEl = document.querySelector('.timer');
+
+  // When going through each question, if the label exists, make sure to remove it
+  // So that if the next question is the opposite (from correct to incorrect), it updates accordingly
+  var removeLabel = document.querySelector('.update-label');
+  if (removeLabel) {
+    removeLabel.remove();
+  }
+  // Execute this if option picked is correct
   const correct = () => {
-    // ADD CODE - ADD A TEMPORARY CLASS TO THE .TIMER LABEL TO FLASH GREEN
-    // - Also generate a new element that tells the user he got the answer right
+    // Increment score
     score++;
+    // Add a class of 'correct' to the label so it changes to green temporarily
+    timerEl.classList.add('correct');
+
+    createLabel('Correct!', 'correct');
   };
+  // Execute this if option picked is incorrect
   const incorrect = () => {
-    // ADD CODE - ADD A TEMPORARY CLASS TO THE .TIMER LABEL TO FLASH RED
-    // - Also generate a new element that tells the user he got the answer wrong
+    // Deduct 5 seconds from the timer
     timeLeft -= 5;
+    // Add a class of 'incorrect' to the label so it changes to red temporarily
+    timerEl.classList.add('flashRed');
+
+    createLabel('Incorrect!', 'incorrect');
   };
 
+  // If the chosen answer is correct, execute correct() else incorrect()
   response == questions[currentQuiz].answer ? correct() : incorrect();
   currentQuiz++;
 
@@ -130,12 +177,42 @@ function checkResponse(response) {
     loadQuiz(); // Load new ones (including new question)
   };
   const quizFinished = () => {
-    displayResults(); // Display end game screen
-    quizActive = false;
+    var buttons = document.querySelectorAll('.option');
+
+    buttons.forEach((button) => {
+      button.remove();
+    });
+
+    // Add a 1 second delay before display the end game so it shows the final answer result
+    // That way if the time is deducted for example, we see that happen THEN it shows the end result
+    setTimeout(() => {
+      var removeLabel = document.querySelector('.update-label');
+      removeLabel.remove();
+      displayResults(); // Display end game screen
+      quizActive = false;
+    }, 1400);
   };
 
+  // If we have not finished the full length of the quiz, execute the nextQuestion() else...
+  // Execute quizFinished() function
   currentQuiz < questions.length ? nextQuestion() : quizFinished();
+
+  // Remove the labels and the classes for the timers upon FULL execution of checkResponse()
+  var removeLabel = document.querySelector('.update-label');
+  if (removeLabel) {
+    setTimeout(() => {
+      removeLabel.remove();
+    }, 1500);
+  }
+
+  setTimeout(() => {
+    timerEl.classList.remove('flashRed');
+  }, 500);
+  setTimeout(() => {
+    timerEl.classList.remove('correct');
+  }, 500);
 }
+
 // ------ ------ ------ Generate the option button elements
 function loadOptions() {
   var quizUl = document.querySelector('.questions');
@@ -165,8 +242,9 @@ function resetQuiz(mainContainer) {
   var returnContainer = document.createElement('div');
   returnContainer.classList.add('quiz-container');
   mainContainer.append(returnContainer);
-  var elements = `<h1 id="question-label"></h1>
-        <ul class="questions"></ul>`;
+  var elements = `
+  <h1 id="question-label"></h1>
+  <ul class="questions"></ul>`;
   var quizContainer = document.querySelector('.quiz-container');
   quizContainer.innerHTML = elements;
 }
@@ -182,6 +260,7 @@ function clearData() {
   runOnce = true;
 }
 
+// ------ ------ ------ End game function to play again
 const playAgain = () => {
   // Remove the end game screen
   var endGame = document.querySelector('.endgame-container');
@@ -191,14 +270,16 @@ const playAgain = () => {
 
   startTimer();
 
-  var label = document.querySelector('.timer');
-  label.innerText = timeLeft;
+  var timerEl = document.querySelector('.timer');
+  timerEl.innerText = timeLeft;
 
   resetQuiz(mainContainer);
   var quizContainer = document.querySelector('.quiz-container');
   quizContainer.remove();
   loadQuiz();
 };
+
+// ------ ------ ------ End game function to go back to the intro page
 const returnHome = () => {
   mainContainer.innerHTML = mainPageEl;
   var startQuiz = document.getElementById('start-quiz');
@@ -222,8 +303,8 @@ function displayResults() {
   //      - If local storage doesn't exist, add a score of 0 so there's something to compare it with
   //      - If you get stuck on tracking local high score, refer to the robot gladiator project
   // - Allow user to input their initials so we can submit score to local storage
-  var label = document.querySelector('.timer');
-  label.classList.add('hidden');
+  var timerEl = document.querySelector('.timer');
+  timerEl.classList.add('hidden');
   var quizContainer = document.querySelector('.quiz-container');
   quizContainer.remove();
   var endGame = document.createElement('div');
@@ -252,11 +333,7 @@ function displayResults() {
   var options = document.querySelectorAll('.btn-action');
   options.forEach((button) => {
     button.addEventListener('click', (e) => {
-      if (e.target.innerText == 'Yes') {
-        playAgain();
-      } else {
-        returnHome();
-      }
+      e.target.innerText == 'Yes' ? playAgain() : returnHome();
     });
   });
 }
@@ -267,7 +344,7 @@ var startQuiz = document.getElementById('start-quiz');
 // This will execute upon first application load...
 // Then the functions in displayResults() will from then on
 startQuiz.addEventListener('click', () => {
-  console.log('testttestt');
+  console.log('testttt');
   // Remove intro screen and...
   introEl.remove();
   // Start the quiz
