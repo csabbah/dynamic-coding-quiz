@@ -1,8 +1,10 @@
 // TO DOS
+// - MAYBE - Shuffle questions? Make it random each time
 // - When you get a wrong response, add a temporary class to the timer that flashes red (use SetTimeout())
 // - Show the user when he got the answer right or wrong (via new element)
 // - Add a 'Timer ran out!' element
 // - Update the entire UI
+// TO QUICKLY FIND THE EDIT POINTS, COMMAND F 'ADD CODE'
 
 // Global variables ------ ------ ------ ------ ------ ------ ------ ------ ------ ------
 var questions = [
@@ -20,6 +22,16 @@ var questions = [
     question: 'Why is soup good?',
     options: ['warm', 'good', 'hot', 'sexy'],
     answer: 'hot',
+  },
+  {
+    question: 'Why is my ass haairy?',
+    options: ['boss', 'ok', 'why', 'arab'],
+    answer: 'arab',
+  },
+  {
+    question: 'Is my dick big?',
+    options: ['yes', 'no', 'maybe', 'possibly'],
+    answer: 'yes',
   },
 ];
 
@@ -100,9 +112,13 @@ function trackEvent() {
 // ------ ------ ------ Check result of the user input and determine next course of action
 function checkResponse(response) {
   const correct = () => {
+    // ADD CODE - ADD A TEMPORARY CLASS TO THE .TIMER LABEL TO FLASH GREEN
+    // - Also generate a new element that tells the user he got the answer right
     score++;
   };
   const incorrect = () => {
+    // ADD CODE - ADD A TEMPORARY CLASS TO THE .TIMER LABEL TO FLASH RED
+    // - Also generate a new element that tells the user he got the answer wrong
     timeLeft -= 5;
   };
 
@@ -201,7 +217,7 @@ const returnHome = () => {
 
 // ------ ------ ------ Display the end game result and screen
 function displayResults() {
-  // End game screen
+  // ADD CODE - SHOW THE USER IF THEY BEAT THEIR PREVIOUS HIGH SCORE
   // - Inform the the user if they beat a high score (extract that data from local storage)
   //      - If local storage doesn't exist, add a score of 0 so there's something to compare it with
   //      - If you get stuck on tracking local high score, refer to the robot gladiator project
@@ -230,7 +246,7 @@ function displayResults() {
     e.preventDefault();
     console.log(initials.value); // This returns the input value
     initials.value = ''; // Reset value
-    // ENTER CODE HERE TO SAVE TO LOCAL STORAGE
+    // ADD CODE - ENTER CODE HERE TO SAVE TO LOCAL STORAGE
   });
 
   var options = document.querySelectorAll('.btn-action');
