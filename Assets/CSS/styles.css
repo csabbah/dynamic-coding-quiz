@@ -3,8 +3,23 @@
   margin: 0;
 }
 
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 ul {
   list-style: none;
+}
+
+.timer {
+  opacity: 1;
+}
+
+.hidden {
+  opacity: 0;
 }
 
 main {
