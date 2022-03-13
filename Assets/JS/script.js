@@ -1,10 +1,7 @@
 // TO DOS
-// - MAYBE - Shuffle questions? Make it random each time
-// - When you get a wrong response, add a temporary class to the timer that flashes red (use SetTimeout())
-// - Show the user when he got the answer right or wrong (via new element)
+// - When you remove the label after 1.5 seconds, make it fade?? via JS?
 // - Add a 'Timer ran out!' element
 // - Update the entire UI
-// TO QUICKLY FIND THE EDIT POINTS, COMMAND F 'ADD CODE'
 
 // Global variables ------ ------ ------ ------ ------ ------ ------ ------ ------ ------
 var questions = [
@@ -46,9 +43,16 @@ quizActive = true;
 runOnce = true;
 
 var mainPageEl = `<div class="timer hidden">60</div>
+      
       <div id="intro">
-      <h1>Welcome to the quiz!</h1>
+      <h1>Coding Quiz Challenge!</h1>
+      <p id='desc'>Try to answer the following code-related 
+      questions within the time limit. Keep in mind that incorrect 
+      answers will penalize your score/time by 5 seconds!</p>
+      <div id='intro-options'>
       <button id="start-quiz">Start Quiz</button>
+      <button id='highscore'>View highscore</button>
+      </div>
       </div> 
       `;
 mainContainer.innerHTML = mainPageEl;
@@ -136,7 +140,7 @@ function createLabel(status, classname) {
   var element = document.createElement('div');
   element.classList.add('update-label');
   element.innerHTML = `<hr />
-      <h1 class="label ${classname}">${status}!</h1>`;
+      <h1 class="label ${classname}">${status}</h1>`;
   mainContainer.append(element);
 }
 // ------ ------ ------ Check result of the user input and determine next course of action
@@ -262,6 +266,9 @@ function clearData() {
 
 // ------ ------ ------ End game function to play again
 const playAgain = () => {
+  // Update main container styling
+  mainContainer.style.justifyContent = 'space-between';
+
   // Remove the end game screen
   var endGame = document.querySelector('.endgame-container');
   endGame.remove();
@@ -281,6 +288,9 @@ const playAgain = () => {
 
 // ------ ------ ------ End game function to go back to the intro page
 const returnHome = () => {
+  // Update main container styling
+  mainContainer.style.justifyContent = 'space-between';
+  // Revert back to the intro screen
   mainContainer.innerHTML = mainPageEl;
   var startQuiz = document.getElementById('start-quiz');
   var introEl = document.getElementById('intro');
@@ -309,17 +319,25 @@ function displayResults() {
   quizContainer.remove();
   var endGame = document.createElement('div');
   endGame.classList.add('endgame-container');
-  endGame.innerHTML = `<h1>Your score: ${score}</h1>
-  <p>You got ${score} out of ${questions.length} correct with ${timeLeft} seconds remaining.</p>
+  endGame.innerHTML = `
+  ${timeLeft == 0 ? `<p id='timeout'>Timer ran out!<p/>` : ``}
+  <h1>Your score: ${score}</h1>
+  <p>You got ${score} out of ${
+    questions.length
+  } questions correct with ${timeLeft} seconds remaining.</p>
   <form id='submit-initials'> 
   <label for='initials'>Enter your initials</label>
   <input id='initials'></input>
   <button type='submit'>Submit</button> 
   </form>
   <p>Want to play again?</p> 
+  <div>
   <button class='btn btn-action' id='yes'>Yes</button>
-  <button class='btn btn-action' id='no'>No</button>`;
+  <button class='btn btn-action' id='no'>No</button>
+  </div>
+  <button id='highscore'>View highscore</button>`;
 
+  mainContainer.style.justifyContent = 'center';
   mainContainer.append(endGame);
   var initials = document.getElementById('initials');
   var form = document.getElementById('submit-initials');
@@ -344,7 +362,6 @@ var startQuiz = document.getElementById('start-quiz');
 // This will execute upon first application load...
 // Then the functions in displayResults() will from then on
 startQuiz.addEventListener('click', () => {
-  console.log('testttt');
   // Remove intro screen and...
   introEl.remove();
   // Start the quiz
