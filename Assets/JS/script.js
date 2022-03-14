@@ -1,7 +1,7 @@
+// Carlos Sabbah - March 14th 2022
+
 // TO DOS
 // - Inform the user via alert if they beat their high score
-// - SORT the object based on the score (high to low) THEN add it to local storage
-// - CLEAN UP JS CODE
 // - Update questions and make sure there are 10
 // Global variables ------ ------ ------ ------ ------ ------ ------ ------ ------ ------
 
@@ -228,9 +228,9 @@ function checkResponse(response) {
     clearOptions(); // Clear current options
     loadQuiz(); // Load new ones (including new question)
   };
+
   const quizFinished = () => {
     var buttons = document.querySelectorAll('.option');
-
     buttons.forEach((button) => {
       button.remove();
     });
@@ -466,7 +466,7 @@ function displayResults() {
       var resetInfo = document.createElement('p');
       resetInfo.classList.add('score-info');
       resetInfo.innerHTML =
-        'To reset data, go back home and <em>view highscore</em>';
+        'Score is sorted from highest to lowest. To reset data, click "No" & <em>view highscore</em>';
       mainHighscoreEl.append(resetInfo);
 
       // Hide the 'Clear highscore" and "Go back" buttons from the highscore container as there is no need.
@@ -481,16 +481,32 @@ function displayResults() {
       postSubmitEl.style.display = 'flex';
       form.style.display = 'none';
 
-      // This adds the active scores from the local storage to the array
+      // This adds the score from the local array to the local storage
       saveScore(initials.value, score);
 
+      // We then parse the local storage data
       var localScore = localStorage.getItem('scores');
       parsedScore = JSON.parse(localScore);
-      parsedScore.forEach((item) => {
-        prevScore = document.createElement('p');
-        prevScore.innerText = `${item.initials} - ${item.highscore}`;
-        highscoreSubmission.appendChild(prevScore);
+      current = initials.value;
+      // Sort the object from high to low (based on the score value)
+      parsedScore.sort(function (a, b) {
+        return b['highscore'] - a['highscore'];
       });
+
+      // Then after the sorting, generate the elements and add them to the score container
+      for (let i = 0; i < parsedScore.length; ) {
+        // Add a specific color and text to the most current score
+        if (parsedScore[i].initials == current) {
+          prevScore = document.createElement('p');
+          prevScore.innerText = `${parsedScore[i].initials} - ${parsedScore[i].highscore} < Current Score`;
+          prevScore.style.color = 'red';
+        } else {
+          prevScore = document.createElement('p');
+          prevScore.innerText = `test ${parsedScore[i].initials} - ${parsedScore[i].highscore}`;
+        }
+        highscoreSubmission.appendChild(prevScore);
+        i++;
+      }
 
       initials.value = ''; // Reset value
     }
@@ -530,9 +546,15 @@ const handleHighscore = () => {
 
     // If the score in local doesn't exist, then return nothing...
     var localScore = localStorage.getItem('scores');
+
     if (localScore === null) {
     } else {
       if (oneTime) {
+        // Sort the object from high to low (based on the score value)
+        parsedScore.sort(function (a, b) {
+          return b['highscore'] - a['highscore'];
+        });
+
         // else, add the local storage scores to the HTML element
         parsedScore.forEach((item) => {
           if (item.initials == undefined || item.highscore == undefined) {
