@@ -84,15 +84,18 @@ const startTimer = () => {
     if (timeLeft == 0) {
       clearInterval(timeInterval);
       displayResults();
-      // The other instance in which we stop the timer involves when the quiz is done AFTER all questions have been answered
+      // The other instance in which we stop the timer involves...
+      // when the quiz is done AFTER all questions have been answered
     } else if (!quizActive) {
       clearInterval(timeInterval);
     }
+    // Decrement by 1 second each iteration
   }, 1000);
 };
 
 // ------ ------ ------ Load the quiz with the current index and check responses
 const loadQuiz = () => {
+  // Create the quiz container and include the question label and the UL which holds the options
   var returnContainer = document.createElement('div');
   returnContainer.classList.add('quiz-container');
   mainContainer.append(returnContainer);
@@ -103,13 +106,12 @@ const loadQuiz = () => {
   quizContainer.innerHTML = elements;
 
   // For each quiz, display the questions, options and add an event for the current buttons
-  const currentQuizData = questions[currentQuiz];
+  const currentQuizData = questions[currentQuiz]; // Go through the array using the currentQuiz index
   var questionLabel = document.getElementById('question-label');
-  questionLabel.innerText = currentQuizData.question;
+  questionLabel.innerText = currentQuizData.question; // Add the question to the element innerText
   loadOptions(); // Load all option button elements
   trackEvent(); // Add event listener to all the buttons we generated
   // And check the response we clicked on
-
   runOnce = false; // Set to false so we don't re-run the timer function
 };
 
@@ -121,7 +123,7 @@ function trackEvent() {
     button.addEventListener('click', (e) => {
       // Extract the data attributes from the button (which is the response itself)
       optionPicked = e.target.attributes['data-option'].value;
-      checkResponse(optionPicked);
+      checkResponse(optionPicked); // Check the response the user chose
     });
   });
 }
@@ -132,7 +134,7 @@ const correct = () => {
   score++;
   // Add a class of 'correct' to the label so it changes to green temporarily
   timerEl.classList.add('correct');
-
+  // Create and display the label
   createLabel('Correct!', 'correct');
 };
 // Execute this if option picked is incorrect
@@ -141,7 +143,7 @@ const incorrect = () => {
   timeLeft -= 5;
   // Add a class of 'incorrect' to the label so it changes to red temporarily
   timerEl.classList.add('flashRed');
-
+  // Create and display the label
   createLabel('Incorrect!', 'incorrect');
 };
 
@@ -345,6 +347,7 @@ const returnHome = () => {
 
 // ------ ------ ------ Display the end game result and screen
 function displayResults() {
+  // Here we create the post submission element container
   var postSubmitEl = `<div class='post-submission-el hidden'> 
   <div class='play-again'>
   <p>Want to play again?</p> 
@@ -355,16 +358,20 @@ function displayResults() {
   </div>
   </div>`;
 
-  // - Inform the the user if they beat a high score (extract that data from local storage)
+  // - Inform the the user if they beat a high score via alert (extract that data from local storage)
   //      - If local storage doesn't exist, add a score of 0 so there's something to compare it with
   //      - If you get stuck on tracking local high score, refer to the robot gladiator project
   // - Allow user to input their initials so we can submit score to local storage
+  // Hide the timer since we are in the results phase
   var timerEl = document.querySelector('.timer');
   timerEl.classList.add('hidden');
+  // Remove the quiz container
   var quizContainer = document.querySelector('.quiz-container');
   quizContainer.remove();
+  // Then create a dynamic end game screen including the form and the results from the quiz
   var endGame = document.createElement('div');
   endGame.classList.add('endgame-container');
+  // If the time left is 0, generate a specific end game screen to inform the user
   endGame.innerHTML = `
   <div class='end-game-header'>
   ${
@@ -383,11 +390,15 @@ function displayResults() {
   </form>
   ${postSubmitEl}`;
 
+  // Additional styling to the mainContainer
   mainContainer.style.justifyContent = 'center';
   mainContainer.style.flexDirection = 'column';
   mainContainer.style.alignItems = 'center';
 
+  // Finally, append the elements we generated above to the main container
   mainContainer.append(endGame);
+
+  // Everything below handles the form handling and submission
   var initials = document.getElementById('initials');
   var form = document.getElementById('submit-initials');
   var highscoreSubmission = document.querySelector('.box');
@@ -395,8 +406,7 @@ function displayResults() {
   var postSubmitEl = document.querySelector('.post-submission-el');
 
   form.addEventListener('submit', (e) => {
-    e.preventDefault();
-
+    e.preventDefault(); // Prevent the browser from refreshing
     if (
       // If the field is empty, inform the user...
       initials.value == '' ||
@@ -406,17 +416,20 @@ function displayResults() {
       alert('Please type an initial');
       // Else use the data and alter the elements
     } else {
-      // ADD CODE - ENTER CODE HERE TO SAVE TO LOCAL STORAGE
       var mainHighscoreEl = document.getElementById('inner-score');
       mainHighscoreEl.style.display = 'unset';
       var clearBtn = document.querySelector('.clear-score');
       var goBackBtn = document.querySelector('.go-back');
+      // Create an element specifically in the end game phase to inform the user where they can go to
+      // reset their high score. This element will be removed when returning home
       var resetInfo = document.createElement('p');
       resetInfo.classList.add('score-info');
       resetInfo.innerHTML =
         'To reset data, go back home and <em>view highscore</em>';
       mainHighscoreEl.append(resetInfo);
 
+      // Hide the 'Clear highscore" and "Go back" buttons from the highscore container as there is no need.
+      // Reason for this > there is already a "want to play again?" prompt that handles the functions
       clearBtn.style.display = 'none';
       goBackBtn.style.display = 'none';
 
@@ -433,14 +446,22 @@ function displayResults() {
     }
   });
 
+  // This tracks the 'Yes' and "No" prompts at the very end of the game
   var options = document.querySelectorAll('.btn-action');
   options.forEach((button) => {
     button.addEventListener('click', (e) => {
+      // If they chose yes, playAgain() else returnHome()
+      // playAgain() re-generates the quiz container elements and starts the game again
+      // returnHome() returns the initial intro screen (the menu itself) and resets the quiz data (i.e. score)
+      // So that if user plays again, it's good to go
       e.target.innerText == 'Yes' ? playAgain() : returnHome();
     });
   });
 }
 
+// This entire block preserves the event listeners for the highscore element (page)
+// The reason for this > since we use innerHTML a lot, it disrupts MANY event listeners, therefore...
+// anytime an edit is made using innerHTML, i re-call the event listeners ( i.e. handleHighscore() )
 const handleHighscore = () => {
   var introEl = document.getElementById('intro');
   var highscoreBtn = document.getElementById('highscore');
@@ -455,34 +476,39 @@ const handleHighscore = () => {
 
     clearScore.addEventListener('click', () => {
       if (
+        // If there are no score to begin with, alert the user
         highscoreSubmissionMenu.length < 1 ||
         highscoreSubmissionMenu.length == undefined
       ) {
         alert('No highscores to reset');
       } else {
+        // Otherwise, clear it
         highscoreSubmissionMenu.innerHTML = '';
       }
     });
 
     var goBack = document.querySelector('.go-back');
     goBack.addEventListener('click', () => {
+      // Go back simply hides the high score element and re-displays the intro screen
       introEl.style.display = 'unset';
       mainHighscoreEl.style.display = 'none';
     });
   });
 };
 
-// Since we use innerHTML a lot, it disrupts MANY event listeners, so anytime an edit is made using innerHTML, i re-call the event listeners
 var highscoreBtn = document.getElementById('highscore');
 var mainHighscoreEl = document.getElementById('inner-score');
 var introEl = document.getElementById('intro');
 var startQuiz = document.getElementById('start-quiz');
+
+// Execute the event listener for the high score elements
 handleHighscore();
 
 // This will execute upon first application load...
 // Then the functions in displayResults() will from then on
 startQuiz.addEventListener('click', () => {
-  mainHighscoreEl.style.display = 'none';
+  mainHighscoreEl.style.display = 'none'; // When the quiz starts, hide the highscore element
+  // so it doesn't disrupt the layout. We will re-display it upon end game
 
   // Remove intro screen and...
   introEl.remove();
