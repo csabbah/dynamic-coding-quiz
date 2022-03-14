@@ -1,9 +1,9 @@
 // TO DOS
-// - When you remove the label after 1.5 seconds, make it fade?? via JS?
-// - Add a 'Timer ran out!' element
-// - Update the entire UI
-
+// - Add a local storage function
+// - Create an object to hold all the scores and PUSH the scores as they get submitted
+// - Additionally, add them to the local storage
 // Global variables ------ ------ ------ ------ ------ ------ ------ ------ ------ ------
+
 var questions = [
   {
     question: 'What color is the sky?',
@@ -43,7 +43,14 @@ quizActive = true;
 runOnce = true;
 
 var mainPageEl = `<div class="timer hidden">60</div>
-      
+      <div id="intro-highscore-container">
+        <div id="inner-score">
+          <h1>Highscores</h1>
+          <div class="box"></div>
+          <button class="btn clear-score">Clear Highscore</button>
+          <button class="btn go-back">Go back</button>
+        </div>
+      </div>
       <div id="intro">
       <h1>Coding Quiz Challenge!</h1>
       <p id='desc'>Try to answer the following code-related 
@@ -55,7 +62,6 @@ var mainPageEl = `<div class="timer hidden">60</div>
       </div>
       </div> 
       `;
-mainContainer.innerHTML = mainPageEl;
 
 // ------ ------ ------ Timer function
 var timeLeft = 60;
@@ -187,14 +193,14 @@ function checkResponse(response) {
       button.remove();
     });
 
-    // Add a 1 second delay before display the end game so it shows the final answer result
+    // Add a 1.3 second delay before display the end game so it shows the final answer result
     // That way if the time is deducted for example, we see that happen THEN it shows the end result
     setTimeout(() => {
       var removeLabel = document.querySelector('.update-label');
       removeLabel.remove();
       displayResults(); // Display end game screen
       quizActive = false;
-    }, 1400);
+    }, 1300);
   };
 
   // If we have not finished the full length of the quiz, execute the nextQuestion() else...
@@ -266,8 +272,13 @@ function clearData() {
 
 // ------ ------ ------ End game function to play again
 const playAgain = () => {
+  var mainHighscoreEl = document.getElementById('inner-score');
+  mainHighscoreEl.style.display = 'none';
+
   // Update main container styling
   mainContainer.style.justifyContent = 'space-between';
+  mainContainer.style.flexDirection = 'row-reverse';
+  mainContainer.style.alignItems = 'unset';
 
   // Remove the end game screen
   var endGame = document.querySelector('.endgame-container');
@@ -276,6 +287,9 @@ const playAgain = () => {
   clearData();
 
   startTimer();
+
+  var clearBtn = document.querySelector('.clear-score');
+  var goBackBtn = document.querySelector('.go-back');
 
   var timerEl = document.querySelector('.timer');
   timerEl.innerText = timeLeft;
@@ -290,10 +304,19 @@ const playAgain = () => {
 const returnHome = () => {
   // Update main container styling
   mainContainer.style.justifyContent = 'space-between';
+  mainContainer.style.flexDirection = 'row-reverse';
+  mainContainer.style.alignItems = 'unset';
+
   // Revert back to the intro screen
   mainContainer.innerHTML = mainPageEl;
   var startQuiz = document.getElementById('start-quiz');
   var introEl = document.getElementById('intro');
+
+  handleHighscore();
+  var clearBtn = document.querySelector('.clear-score');
+  var goBackBtn = document.querySelector('.go-back');
+  clearBtn.style.display = 'unset';
+  goBackBtn.style.display = 'unset';
 
   // Upon starting the quiz again...
   startQuiz.addEventListener('click', () => {
@@ -308,7 +331,16 @@ const returnHome = () => {
 
 // ------ ------ ------ Display the end game result and screen
 function displayResults() {
-  // ADD CODE - SHOW THE USER IF THEY BEAT THEIR PREVIOUS HIGH SCORE
+  var postSubmitEl = `<div class='post-submission-el hidden'> 
+  <div class='play-again'>
+  <p>Want to play again?</p> 
+  <div id='play-again-btns'>
+  <button class='btn btn-action' id='yes'>Yes</button>
+  <button class='btn btn-action' id='no'>No</button>
+  </div>
+  </div>
+  </div>`;
+
   // - Inform the the user if they beat a high score (extract that data from local storage)
   //      - If local storage doesn't exist, add a score of 0 so there's something to compare it with
   //      - If you get stuck on tracking local high score, refer to the robot gladiator project
@@ -320,32 +352,65 @@ function displayResults() {
   var endGame = document.createElement('div');
   endGame.classList.add('endgame-container');
   endGame.innerHTML = `
-  ${timeLeft == 0 ? `<p id='timeout'>Timer ran out!<p/>` : ``}
-  <h1>Your score: ${score}</h1>
-  <p>You got ${score} out of ${
+  <div class='end-game-header'>
+  ${
+    timeLeft == 0
+      ? `<h1 id='timeout'>Timer ran out!<h1/>`
+      : `<h1>All done!</h1>`
+  }
+  <p>Your final score is ${score}. You got ${score} out of ${
     questions.length
   } questions correct with ${timeLeft} seconds remaining.</p>
-  <form id='submit-initials'> 
-  <label for='initials'>Enter your initials</label>
-  <input id='initials'></input>
-  <button type='submit'>Submit</button> 
-  </form>
-  <p>Want to play again?</p> 
-  <div>
-  <button class='btn btn-action' id='yes'>Yes</button>
-  <button class='btn btn-action' id='no'>No</button>
   </div>
-  <button id='highscore'>View highscore</button>`;
+  <form id='submit-initials'> 
+  <label for='initials'>Enter initials:</label>
+  <input id='initials'></input>
+  <button id='submit' type='submit'>Submit</button> 
+  </form>
+  ${postSubmitEl}`;
 
   mainContainer.style.justifyContent = 'center';
+  mainContainer.style.flexDirection = 'column';
+  mainContainer.style.alignItems = 'center';
+
   mainContainer.append(endGame);
   var initials = document.getElementById('initials');
   var form = document.getElementById('submit-initials');
+  var highscoreSubmission = document.querySelector('.box');
+  var endgameHeaderEl = document.querySelector('.end-game-header');
+  var postSubmitEl = document.querySelector('.post-submission-el');
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    console.log(initials.value); // This returns the input value
-    initials.value = ''; // Reset value
-    // ADD CODE - ENTER CODE HERE TO SAVE TO LOCAL STORAGE
+
+    if (
+      // If the field is empty, inform the user...
+      initials.value == '' ||
+      initials.value == null ||
+      initials.value == undefined
+    ) {
+      alert('Please type an initial');
+      // Else use the data and alter the elements
+    } else {
+      // ADD CODE - ENTER CODE HERE TO SAVE TO LOCAL STORAGE
+      var mainHighscoreEl = document.getElementById('inner-score');
+      mainHighscoreEl.style.display = 'unset';
+      var clearBtn = document.querySelector('.clear-score');
+      var goBackBtn = document.querySelector('.go-back');
+      clearBtn.style.display = 'none';
+      goBackBtn.style.display = 'none';
+
+      // Alter the end game screen elements styling
+      endgameHeaderEl.style.display = 'none';
+      postSubmitEl.classList.remove('hidden');
+      postSubmitEl.classList.add('active');
+      postSubmitEl.style.display = 'flex';
+      form.style.display = 'none';
+
+      // Add the initials and current score
+      highscoreSubmission.innerHTML = `<p>${initials.value} - ${score}</p>`;
+      initials.value = ''; // Reset value
+    }
   });
 
   var options = document.querySelectorAll('.btn-action');
@@ -356,12 +421,49 @@ function displayResults() {
   });
 }
 
+const handleHighscore = () => {
+  var introEl = document.getElementById('intro');
+  var highscoreBtn = document.getElementById('highscore');
+  var mainHighscoreEl = document.getElementById('inner-score');
+
+  highscoreBtn.addEventListener('click', () => {
+    introEl.style.display = 'none';
+    mainHighscoreEl.style.display = 'unset';
+
+    var highscoreSubmissionMenu = document.querySelector('.box');
+    var clearScore = document.querySelector('.clear-score');
+
+    clearScore.addEventListener('click', () => {
+      if (
+        highscoreSubmissionMenu.length < 1 ||
+        highscoreSubmissionMenu.length == undefined
+      ) {
+        alert('No highscores to reset');
+      } else {
+        highscoreSubmissionMenu.innerHTML = '';
+      }
+    });
+
+    var goBack = document.querySelector('.go-back');
+    goBack.addEventListener('click', () => {
+      introEl.style.display = 'unset';
+      mainHighscoreEl.style.display = 'none';
+    });
+  });
+};
+
+// Since we use innerHTML a lot, it disrupts MANY event listeners, so anytime an edit is made using innerHTML, i re-call the event listeners
+var highscoreBtn = document.getElementById('highscore');
+var mainHighscoreEl = document.getElementById('inner-score');
 var introEl = document.getElementById('intro');
 var startQuiz = document.getElementById('start-quiz');
+handleHighscore();
 
 // This will execute upon first application load...
 // Then the functions in displayResults() will from then on
 startQuiz.addEventListener('click', () => {
+  mainHighscoreEl.style.display = 'none';
+
   // Remove intro screen and...
   introEl.remove();
   // Start the quiz

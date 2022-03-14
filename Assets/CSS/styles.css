@@ -42,7 +42,7 @@ form {
 }
 
 #start-quiz:active {
-  background-color: rgb(73, 0, 73);
+  background-color: rgb(255, 0, 255);
 }
 
 .btn {
@@ -63,7 +63,7 @@ form {
 }
 
 .btn:active {
-  background-color: rgb(73, 0, 73);
+  background-color: rgb(255, 0, 255);
 }
 
 #timeout {
@@ -99,7 +99,27 @@ form {
   color: purple;
   cursor: pointer;
 }
-#submit-initials button {
+#highscore h1 {
+  color: black;
+}
+.box,
+.box-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background-color: rgba(125, 57, 176, 0.2);
+  width: 500px;
+  padding: 10px 0;
+}
+
+#inner-score {
+  display: none;
+}
+.box p {
+  color: black;
+  margin-left: 15px;
+}
+#submit {
   width: 100px;
   padding: 10px 0;
   background-color: purple;
@@ -107,6 +127,29 @@ form {
   cursor: pointer;
   border-radius: 4px;
   color: white;
+}
+
+.post-submission-el.hidden {
+  display: none;
+}
+
+.post-submission-el.active {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.clear-score {
+  margin-top: 10px;
+}
+.play-again {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#play-again-btns {
+  margin-top: 5px;
 }
 #initials {
   text-indent: 8px;
@@ -181,10 +224,8 @@ main {
 .endgame-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
 
-.endgame-container p {
-  margin-top: 10px;
+.play-again p {
+  margin-top: 30px;
 }

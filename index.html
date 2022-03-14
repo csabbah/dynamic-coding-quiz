@@ -8,7 +8,31 @@
     <title>Rapid Test - Main</title>
   </head>
   <body>
-    <main id="main-container"></main>
+    <main id="main-container">
+      <section id="home-page">
+        <div class="timer hidden">60</div>
+        <div id="intro-highscore-container">
+          <div id="inner-score">
+            <h1>Highscores</h1>
+            <div class="box"></div>
+            <button class="btn clear-score">Clear Highscore</button>
+            <button class="btn go-back">Go back</button>
+          </div>
+        </div>
+        <div id="intro">
+          <h1>Coding Quiz Challenge!</h1>
+          <p id="desc">
+            Try to answer the following code-related questions within the time
+            limit. Keep in mind that incorrect answers will penalize your
+            score/time by 5 seconds!
+          </p>
+          <div id="intro-options">
+            <button id="start-quiz">Start Quiz</button>
+            <button id="highscore">View highscore</button>
+          </div>
+        </div>
+      </section>
+    </main>
     <script src="./Assets/JS/script.js"></script>
   </body>
 </html>
