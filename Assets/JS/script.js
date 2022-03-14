@@ -72,11 +72,9 @@ function returnLocalScore() {
   // Check for the local storage score...
   var localScore = localStorage.getItem('scores');
   // If it's empty, return nothing
-  if (!localScore === null) {
+  if (localScore === null) {
   } else {
     // Else, parse the data so we can use it throughout the application
-    var localScore = localStorage.getItem('scores');
-
     // Get the stored scores
     // Parse the data
     parsedScore = JSON.parse(localScore);
@@ -95,14 +93,15 @@ function returnLocalScore() {
   }
 }
 // Save the score to both the array and the local storage
-function saveScore() {
+function saveScore(initialVal, scoreVal) {
   tempVal = {
-    initials: initials.value,
-    highscore: score,
+    initials: initialVal,
+    highscore: scoreVal,
   };
   storedScores.push(tempVal);
   localStorage.setItem('scores', JSON.stringify(storedScores));
 }
+returnLocalScore();
 
 // ------ ------ ------ Timer function
 var timeLeft = 60;
@@ -315,6 +314,10 @@ function clearData() {
 
 // ------ ------ ------ End game function to play again
 const playAgain = () => {
+  // reset the highscore scores
+  var highscoreSubmission = document.querySelector('.box');
+  highscoreSubmission.innerHTML = '';
+
   // Remove the dynamically added label when user plays again
   var infoEl = document.querySelector('.score-info');
   infoEl.remove();
@@ -334,8 +337,6 @@ const playAgain = () => {
 
   // Set everything to initial status i.e. score = 0
   clearData();
-
-  returnLocalScore(); // Extract the local storage array and parse it so we have the most up to update set
 
   // Start the timer
   startTimer();
@@ -362,7 +363,7 @@ const returnHome = () => {
   var introEl = document.getElementById('intro');
 
   handleHighscore();
-
+  oneTime = true;
   // Bring back the original buttons for the high score element
   // Note - when user finishes quiz, i remove the 'clear score' and 'go back' buttons
   var clearBtn = document.querySelector('.clear-score');
@@ -480,12 +481,16 @@ function displayResults() {
       postSubmitEl.style.display = 'flex';
       form.style.display = 'none';
 
-      // Add the initials and current score
-      highscoreSubmission.innerHTML = `<p>${initials.value} - ${score}</p>`;
-      saveScore();
-
-      parsedScore = JSON.parse(localScore);
       // This adds the active scores from the local storage to the array
+      saveScore(initials.value, score);
+
+      var localScore = localStorage.getItem('scores');
+      parsedScore = JSON.parse(localScore);
+      parsedScore.forEach((item) => {
+        prevScore = document.createElement('p');
+        prevScore.innerText = `${item.initials} - ${item.highscore}`;
+        highscoreSubmission.appendChild(prevScore);
+      });
 
       initials.value = ''; // Reset value
     }
@@ -507,6 +512,7 @@ function displayResults() {
 // This entire block preserves the event listeners for the highscore element (page)
 // The reason for this > since we use innerHTML a lot, it disrupts MANY event listeners, therefore...
 // anytime an edit is made using innerHTML, i re-call the event listeners ( i.e. handleHighscore() )
+var oneTime = true;
 const handleHighscore = () => {
   var introEl = document.getElementById('intro');
   var highscoreBtn = document.getElementById('highscore');
@@ -526,23 +532,26 @@ const handleHighscore = () => {
     var localScore = localStorage.getItem('scores');
     if (localScore === null) {
     } else {
-      // else, add the local storage scores to the HTML element
-      parsedScore.forEach((item) => {
-        if (item.initials == undefined || item.highscore == undefined) {
-        } else {
-          // For each data in the array, create a <p> element with the stored initials and scores...
-          const newEl = document.createElement('p');
-          newEl.innerText = `${item.initials} - ${item.highscore}`;
-          // Then append it to the appropriate container
-          highscoreValues.appendChild(newEl);
-        }
-      });
+      if (oneTime) {
+        // else, add the local storage scores to the HTML element
+        parsedScore.forEach((item) => {
+          if (item.initials == undefined || item.highscore == undefined) {
+          } else {
+            // For each data in the array, create a <p> element with the stored initials and scores...
+            const newEl = document.createElement('p');
+            newEl.innerText = `${item.initials} - ${item.highscore}`;
+            // Then append it to the appropriate container
+            highscoreValues.appendChild(newEl);
+          }
+        });
+      }
     }
+    oneTime = false;
 
     clearScore.addEventListener('click', () => {
       // If there are no score, alert the user
       if (storedScores.length < 1) {
-        alert('No highscores to reset');
+        alert('No high scores to reset');
       } else {
         // Otherwise, clear it
         highscoreValues.innerHTML = '';
@@ -552,10 +561,10 @@ const handleHighscore = () => {
     });
 
     var goBack = document.querySelector('.go-back');
+    // If user hits 'go back'...
     goBack.addEventListener('click', () => {
-      // Go back simply hides the high score element and re-displays the intro screen
-      introEl.style.display = 'unset';
-      mainHighscoreEl.style.display = 'none';
+      // Reload the page
+      location.reload();
     });
   });
 };
