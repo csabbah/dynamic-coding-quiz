@@ -45,6 +45,7 @@ var score = 0; // Keeps track of user score
 var optionCounter = 1; // Counter for the button label i.e. (1. Green, 2. Blue, etc)
 quizActive = true;
 runOnce = true;
+var storedScores = [];
 
 // Holds the main page element so we can revert back to this when user clicks no to playing again
 var mainPageEl = `<div class="timer hidden">60</div>
@@ -67,6 +68,39 @@ var mainPageEl = `<div class="timer hidden">60</div>
       </div>
       </div> 
       `;
+
+// ------ ------ ------ Local Storage functions
+// Return the local storage scores and assign them to the array
+function returnLocalScore() {
+  // Check for the local storage score...
+  var localScore = localStorage.getItem('scores');
+  // If it's empty, return nothing
+  if (localScore === null) {
+  } else {
+    // Else, parse the data so we can use it throughout the application
+    var localScore = localStorage.getItem('scores');
+
+    // Get the stored scores
+    // Parse the data
+    parsedScore = JSON.parse(localScore);
+    // This adds the active scores from the local storage to the array
+    tempVal = {
+      initials: parsedScore.initials,
+      highscore: parsedScore.highscore,
+    };
+
+    storedScores.push(tempVal);
+  }
+}
+// Save the score to both the array and the local storage
+function saveScore() {
+  tempVal = {
+    initials: initials.value,
+    highscore: score,
+  };
+  storedScores.push(tempVal);
+  localStorage.setItem('scores', JSON.stringify(storedScores));
+}
 
 // ------ ------ ------ Timer function
 var timeLeft = 60;
@@ -442,6 +476,8 @@ function displayResults() {
 
       // Add the initials and current score
       highscoreSubmission.innerHTML = `<p>${initials.value} - ${score}</p>`;
+      saveScore();
+
       initials.value = ''; // Reset value
     }
   });
@@ -471,19 +507,34 @@ const handleHighscore = () => {
     introEl.style.display = 'none';
     mainHighscoreEl.style.display = 'unset';
 
-    var highscoreSubmissionMenu = document.querySelector('.box');
+    var highscoreValues = document.querySelector('.box');
     var clearScore = document.querySelector('.clear-score');
 
+    returnLocalScore();
+    // If the score in local doesn't exist, then return nothing...
+    var localScore = localStorage.getItem('scores');
+    if (localScore === null) {
+    } else {
+      // else, add the local storage scores to the element
+      console.log(parsedScore);
+      parsedScore.forEach((item) => {
+        const newEl = document.createElement('p'); // Create an empty <div>
+        newEl.innerText = `${item.initials} - ${item.highscore}`;
+
+        highscoreValues.appendChild(newEl);
+      });
+    }
+
     clearScore.addEventListener('click', () => {
-      if (
-        // If there are no score to begin with, alert the user
-        highscoreSubmissionMenu.length < 1 ||
-        highscoreSubmissionMenu.length == undefined
-      ) {
+      console.log(storedScores);
+      // If there are no score, alert the user
+      if (storedScores.length < 1) {
         alert('No highscores to reset');
       } else {
         // Otherwise, clear it
-        highscoreSubmissionMenu.innerHTML = '';
+        highscoreValues.innerHTML = '';
+        localStorage.clear();
+        storedScores = [];
       }
     });
 
