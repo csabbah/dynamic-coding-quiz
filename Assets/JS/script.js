@@ -1,4 +1,4 @@
-// Carlos Sabbah - March 14th 2022
+// Carlos Sabbah - Quiz Challenge - March 14th 2022
 
 // TO DOS
 // - Inform the user via alert if they beat their high score
@@ -230,6 +230,7 @@ function checkResponse(response) {
   };
 
   const quizFinished = () => {
+    // Remove all button options
     var buttons = document.querySelectorAll('.option');
     buttons.forEach((button) => {
       button.remove();
