@@ -72,7 +72,7 @@ function returnLocalScore() {
   // Check for the local storage score...
   var localScore = localStorage.getItem('scores');
   // If it's empty, return nothing
-  if (localScore === null) {
+  if (!localScore === null) {
   } else {
     // Else, parse the data so we can use it throughout the application
     var localScore = localStorage.getItem('scores');
@@ -81,12 +81,17 @@ function returnLocalScore() {
     // Parse the data
     parsedScore = JSON.parse(localScore);
     // This adds the active scores from the local storage to the array
-    tempVal = {
-      initials: parsedScore.initials,
-      highscore: parsedScore.highscore,
-    };
 
-    storedScores.push(tempVal);
+    parsedScore.forEach((item) => {
+      if (item.initials == undefined || item.highscore == undefined) {
+      } else {
+        tempVal = {
+          initials: item.initials,
+          highscore: item.highscore,
+        };
+        storedScores.push(tempVal);
+      }
+    });
   }
 }
 // Save the score to both the array and the local storage
@@ -330,6 +335,8 @@ const playAgain = () => {
   // Set everything to initial status i.e. score = 0
   clearData();
 
+  returnLocalScore(); // Extract the local storage array and parse it so we have the most up to update set
+
   // Start the timer
   startTimer();
   // Reset the timer, right now, timeLeft is reverted back to 60 seconds
@@ -355,6 +362,7 @@ const returnHome = () => {
   var introEl = document.getElementById('intro');
 
   handleHighscore();
+
   // Bring back the original buttons for the high score element
   // Note - when user finishes quiz, i remove the 'clear score' and 'go back' buttons
   var clearBtn = document.querySelector('.clear-score');
@@ -438,6 +446,7 @@ function displayResults() {
 
   form.addEventListener('submit', (e) => {
     e.preventDefault(); // Prevent the browser from refreshing
+
     if (
       // If the field is empty, inform the user...
       initials.value == '' ||
@@ -474,6 +483,9 @@ function displayResults() {
       // Add the initials and current score
       highscoreSubmission.innerHTML = `<p>${initials.value} - ${score}</p>`;
       saveScore();
+
+      parsedScore = JSON.parse(localScore);
+      // This adds the active scores from the local storage to the array
 
       initials.value = ''; // Reset value
     }
@@ -516,11 +528,14 @@ const handleHighscore = () => {
     } else {
       // else, add the local storage scores to the HTML element
       parsedScore.forEach((item) => {
-        // For each data in the array, create a <p> element with the stored initials and scores...
-        const newEl = document.createElement('p');
-        newEl.innerText = `${item.initials} - ${item.highscore}`;
-        // Then append it to the appropriate container
-        highscoreValues.appendChild(newEl);
+        if (item.initials == undefined || item.highscore == undefined) {
+        } else {
+          // For each data in the array, create a <p> element with the stored initials and scores...
+          const newEl = document.createElement('p');
+          newEl.innerText = `${item.initials} - ${item.highscore}`;
+          // Then append it to the appropriate container
+          highscoreValues.appendChild(newEl);
+        }
       });
     }
 
