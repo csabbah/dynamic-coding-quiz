@@ -1,7 +1,11 @@
 // TO DOS
+// - Inform the user via alert if they beat their high score
 // - Add a local storage function
 // - Create an object to hold all the scores and PUSH the scores as they get submitted
-// - Additionally, add them to the local storage
+// - SORT the object based on the score (high to low) THEN add it to local storage
+// - Add a clear storage function for the scores
+// - CLEAN UP JS CODE
+// - Update questions and make sure there are 10
 // Global variables ------ ------ ------ ------ ------ ------ ------ ------ ------ ------
 
 var questions = [
@@ -42,6 +46,7 @@ var optionCounter = 1; // Counter for the button label i.e. (1. Green, 2. Blue, 
 quizActive = true;
 runOnce = true;
 
+// Holds the main page element so we can revert back to this when user clicks no to playing again
 var mainPageEl = `<div class="timer hidden">60</div>
       <div id="intro-highscore-container">
         <div id="inner-score">
@@ -272,6 +277,11 @@ function clearData() {
 
 // ------ ------ ------ End game function to play again
 const playAgain = () => {
+  // Remove the dynamically added label when user plays again
+  var infoEl = document.querySelector('.score-info');
+  infoEl.remove();
+
+  // Remove score element so user can see the questions again
   var mainHighscoreEl = document.getElementById('inner-score');
   mainHighscoreEl.style.display = 'none';
 
@@ -284,13 +294,12 @@ const playAgain = () => {
   var endGame = document.querySelector('.endgame-container');
   endGame.remove();
 
+  // Set everything to initial status i.e. score = 0
   clearData();
 
+  // Start the timer
   startTimer();
-
-  var clearBtn = document.querySelector('.clear-score');
-  var goBackBtn = document.querySelector('.go-back');
-
+  // Reset the timer, right now, timeLeft is reverted back to 60 seconds
   var timerEl = document.querySelector('.timer');
   timerEl.innerText = timeLeft;
 
@@ -313,10 +322,15 @@ const returnHome = () => {
   var introEl = document.getElementById('intro');
 
   handleHighscore();
+  // Bring back the original buttons for the high score element
+  // Note - when user finishes quiz, i remove the 'clear score' and 'go back' buttons
   var clearBtn = document.querySelector('.clear-score');
   var goBackBtn = document.querySelector('.go-back');
   clearBtn.style.display = 'unset';
   goBackBtn.style.display = 'unset';
+  // // This is the label that informs the user where to reset the scores
+  // var info = document.getElementById('score-info');
+  // info.style.display = 'none';
 
   // Upon starting the quiz again...
   startQuiz.addEventListener('click', () => {
@@ -397,6 +411,12 @@ function displayResults() {
       mainHighscoreEl.style.display = 'unset';
       var clearBtn = document.querySelector('.clear-score');
       var goBackBtn = document.querySelector('.go-back');
+      var resetInfo = document.createElement('p');
+      resetInfo.classList.add('score-info');
+      resetInfo.innerHTML =
+        'To reset data, go back home and <em>view highscore</em>';
+      mainHighscoreEl.append(resetInfo);
+
       clearBtn.style.display = 'none';
       goBackBtn.style.display = 'none';
 

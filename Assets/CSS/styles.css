@@ -148,6 +148,9 @@ form {
   align-items: center;
 }
 
+.score-info {
+  font-size: 17px;
+}
 #play-again-btns {
   margin-top: 5px;
 }
