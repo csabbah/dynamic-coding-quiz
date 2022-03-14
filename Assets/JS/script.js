@@ -1,9 +1,6 @@
 // TO DOS
 // - Inform the user via alert if they beat their high score
-// - Add a local storage function
-// - Create an object to hold all the scores and PUSH the scores as they get submitted
 // - SORT the object based on the score (high to low) THEN add it to local storage
-// - Add a clear storage function for the scores
 // - CLEAN UP JS CODE
 // - Update questions and make sure there are 10
 // Global variables ------ ------ ------ ------ ------ ------ ------ ------ ------ ------
@@ -504,29 +501,30 @@ const handleHighscore = () => {
   var mainHighscoreEl = document.getElementById('inner-score');
 
   highscoreBtn.addEventListener('click', () => {
+    // Upon clicking the view highscore button, hide the intro and display the highscore element instead
     introEl.style.display = 'none';
     mainHighscoreEl.style.display = 'unset';
 
     var highscoreValues = document.querySelector('.box');
     var clearScore = document.querySelector('.clear-score');
 
-    returnLocalScore();
+    returnLocalScore(); // Extract the local storage array and parse it so we have the most up to update set
+
     // If the score in local doesn't exist, then return nothing...
     var localScore = localStorage.getItem('scores');
     if (localScore === null) {
     } else {
-      // else, add the local storage scores to the element
-      console.log(parsedScore);
+      // else, add the local storage scores to the HTML element
       parsedScore.forEach((item) => {
-        const newEl = document.createElement('p'); // Create an empty <div>
+        // For each data in the array, create a <p> element with the stored initials and scores...
+        const newEl = document.createElement('p');
         newEl.innerText = `${item.initials} - ${item.highscore}`;
-
+        // Then append it to the appropriate container
         highscoreValues.appendChild(newEl);
       });
     }
 
     clearScore.addEventListener('click', () => {
-      console.log(storedScores);
       // If there are no score, alert the user
       if (storedScores.length < 1) {
         alert('No highscores to reset');
