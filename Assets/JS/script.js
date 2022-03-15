@@ -8,29 +8,51 @@
 
 var questions = [
   {
-    question: 'What color is the sky?',
-    options: ['red', 'green', 'blue', 'orange'],
-    answer: 'blue',
+    question: 'Commonly used data types do NOT include:',
+    options: ['Strings', 'Booleans', 'Alerts', 'Numbers'],
+    answer: 'Alerts',
   },
   {
-    question: 'Why am i gay?',
-    options: ['idk', 'suure', 'why', 'yes'],
-    answer: 'idk',
+    question: 'The condition in an if/else statement is enclosed in:',
+    options: ['Quotes', 'Parenthesis', 'Curly Brackets', 'Square Brackets'],
+    answer: 'Parenthesis',
   },
   {
-    question: 'Why is soup good?',
-    options: ['warm', 'good', 'hot', 'sexy'],
-    answer: 'hot',
+    question: 'Arrays in JavaScript can be used to store:',
+    options: [
+      'Numbers and Strings',
+      'Other Arrays',
+      'Booleans',
+      'All of the above',
+    ],
+    answer: 'All of the above',
   },
   {
-    question: 'Why do i like COD?',
-    options: ['boss', 'ok', 'why', 'arab'],
-    answer: 'arab',
+    question:
+      'String values must be enclosed within ______ when being assigned to variables',
+    options: ['Commas', 'Curly Brackets', 'Quotes', 'Parenthesis'],
+    answer: 'Quotes',
   },
   {
-    question: 'Am i tranny?',
-    options: ['yes', 'no', 'maybe', 'possibly'],
-    answer: 'yes',
+    question:
+      'A very useful tool used during development and debugging for printing content to the debugger is:',
+    options: ['JavaScript', 'Terminal Bash', 'for loops', 'console.log'],
+    answer: 'console.log',
+  },
+  {
+    question: 'What does forEach do?',
+    options: [
+      'Loops over data',
+      'Adds values',
+      'Logs results',
+      'Creates events',
+    ],
+    answer: 'Loops over data',
+  },
+  {
+    question: 'The appendChild() method places a node as the ____ child.',
+    options: ['First', 'Middle', 'Random', 'Last'],
+    answer: 'Last',
   },
 ];
 
@@ -88,6 +110,7 @@ function returnLocalScore() {
           initials: item.initials,
           highscore: item.highscore,
           id: item.Id,
+          timeLeft: item.timeLeft,
         };
         storedScores.push(tempVal);
       }
@@ -95,11 +118,12 @@ function returnLocalScore() {
   }
 }
 // Save the score to both the array and the local storage
-function saveScore(initialVal, scoreVal, Id) {
+function saveScore(initialVal, scoreVal, Id, timeLeft) {
   tempVal = {
     initials: initialVal,
     highscore: scoreVal,
     id: Id,
+    timeLeft: timeLeft,
   };
   storedScores.push(tempVal);
   localStorage.setItem('scores', JSON.stringify(storedScores));
@@ -275,7 +299,8 @@ function loadOptions() {
 
   questions[currentQuiz].options.forEach((option) => {
     var questionEl = document.createElement('li');
-    questionEl.innerHTML = `<div><button data-option="${option}" class='btn option'>${optionCounter}. ${option}</button></div>`;
+    questionEl.innerHTML = `<div><button data-option="${option}" 
+    class='btn option'>${optionCounter}. ${option}</button></div>`;
     optionCounter++;
     quizUl.append(questionEl);
   });
@@ -417,11 +442,8 @@ function displayResults() {
   ${
     timeLeft == 0
       ? `<h1 id='timeout'>Timer ran out!<h1/>`
-      : `<h1>All done!</h1>`
-  }
-  <p>Your final score is ${score}. You got ${score} out of ${
-    questions.length
-  } questions correct with ${timeLeft} seconds remaining.</p>
+      : `<h1 id='done'>All done!</h1>`
+  } <em>Your final score is ${score} with ${timeLeft} seconds remaining.</em>
   </div>
   <form id='submit-initials'> 
   <label for='initials'>Enter initials:</label>
@@ -495,8 +517,10 @@ function displayResults() {
       // We also refer to this ID when checking for the current score on the leader board
       var id = Math.ceil(Math.random(1) * 100000);
 
+      timeLeft += 1; // The time decrements by 1 at this stage so i increment by 1 to account for this
+
       // This adds the score and initials to the local storage
-      saveScore(initials.value, score, id);
+      saveScore(initials.value, score, id, timeLeft);
 
       // We then parse the local storage data
       var localScore = localStorage.getItem('scores');
@@ -515,12 +539,14 @@ function displayResults() {
         // Add a specific color and text to the most current score
         if (parsedScore[i].id == id) {
           prevScore = document.createElement('p');
-          prevScore.innerText = `${parsedScore[i].initials} - ${parsedScore[i].highscore} < Current Score`;
+          prevScore.classList.add('user-scores');
+          prevScore.innerText = `${parsedScore[i].initials} - - Score: ${parsedScore[i].highscore} - - Time left: ${parsedScore[i].timeLeft} sec < Current Score`;
           prevScore.style.color = 'red';
         } else {
           // Otherwise just add the score with no special text or styling
           prevScore = document.createElement('p');
-          prevScore.innerText = `${parsedScore[i].initials} - ${parsedScore[i].highscore}`;
+          prevScore.classList.add('user-scores');
+          prevScore.innerText = `${parsedScore[i].initials} - - Score: ${parsedScore[i].highscore} - - Time left: ${parsedScore[i].timeLeft} sec`;
         }
         highscoreSubmission.appendChild(prevScore);
         i++;
@@ -590,13 +616,15 @@ const handleHighscore = () => {
           } else {
             // For each data in the array, create a <p> element with the stored initials and scores...
             const newEl = document.createElement('p');
-            newEl.innerText = `${item.initials} - ${item.highscore}`;
+            newEl.classList.add('user-scores');
+            newEl.innerText = `${item.initials} - - Score: ${item.highscore} - - Time left: ${item.timeLeft} sec`;
             // Then append it to the appropriate container
             highscoreValues.appendChild(newEl);
           }
         });
       }
     }
+
     oneTime = false;
 
     clearScore.addEventListener('click', () => {

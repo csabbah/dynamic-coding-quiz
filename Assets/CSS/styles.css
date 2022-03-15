@@ -46,11 +46,11 @@ form {
 }
 
 .btn {
-  width: 150px;
-  padding: 10px 0;
+  width: 220px;
+  padding: 12px 2px;
   text-indent: 10px;
   text-align: left;
-  margin: 5px 0;
+  margin: 6px 0;
   background-color: purple;
   border: none;
   cursor: pointer;
@@ -84,7 +84,11 @@ form {
   display: flex;
   flex-direction: row-reverse;
   justify-content: space-between;
-  width: 600px;
+  width: 700px;
+}
+
+#title {
+  font-size: 40px;
 }
 
 #intro-options {
@@ -108,12 +112,15 @@ form {
   flex-direction: column;
   align-items: flex-start;
   background-color: rgba(125, 57, 176, 0.2);
-  width: 500px;
+  width: 650px;
   padding: 10px 0;
 }
 
 #inner-score {
   display: none;
+}
+#inner-score h1 {
+  margin-bottom: 5px;
 }
 .box p {
   color: black;
@@ -142,15 +149,35 @@ form {
 .clear-score {
   margin-top: 10px;
 }
+
+.end-game-header em {
+  font-weight: 400;
+  font-style: normal;
+  font-size: 30px;
+}
+
+#timeout,
+#done {
+  font-size: 40px;
+  margin-bottom: 5px;
+}
+#question-label {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
 .play-again {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
+.user-scores {
+  margin: 3px 0;
+}
+
 .score-info {
   margin-top: 5px;
-  font-size: 15px;
+  font-size: 16px;
 }
 #play-again-btns {
   margin-top: 5px;
@@ -158,8 +185,13 @@ form {
 #initials {
   text-indent: 8px;
   padding: 8px 0;
+  width: 250px;
+  border-radius: 5px;
 }
 
+#submit-initials label {
+  font-size: 25px;
+}
 @keyframes anim-flashRed {
   0% {
     color: black;
@@ -182,6 +214,7 @@ form {
 }
 
 .timer {
+  margin-left: 10px;
   font-size: 50px;
   color: black;
   display: flexs;
