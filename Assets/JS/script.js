@@ -127,7 +127,6 @@ returnLocalScore();
 
 // ------ ------ ------ Timer function
 var timeLeft = 60;
-
 const startTimer = () => {
   var timerEl = document.querySelector('.timer');
   timerEl.classList.remove('hidden');
@@ -213,6 +212,7 @@ function createLabel(status, classname) {
       <h1 class="label ${classname}">${status}</h1>`;
   mainContainer.append(element);
 }
+
 // ------ ------ ------ Check result of the user input and determine next course of action
 function checkResponse(response) {
   var timerEl = document.querySelector('.timer');
@@ -409,8 +409,8 @@ const returnHome = () => {
   });
 };
 
-// ------ ------ ------ Display the end game result and screen
-function displayResults() {
+// ------ ------ ------ Generate the end game element
+function generateEndgameEl() {
   // This will create the post submission element container
   var postSubmitEl = `<div class='post-submission-el hidden'> 
 <div class='play-again'>
@@ -454,6 +454,56 @@ function displayResults() {
 
   // Finally, append the elements we generated above to the main container
   mainContainer.append(endGame);
+}
+
+// ------ ------ ------ In the end game element, show all scores and then compare current score
+// with saved scores (if they exist)
+function displayHighscore(
+  id,
+  longestDuration,
+  largestNum,
+  highscoreSubmission
+) {
+  // Then after the sorting, generate the elements and add them to the score container
+  for (let i = 0; i < parsedScore.length; ) {
+    // Add a specific color and text to the most current score
+    if (parsedScore[i].id == id) {
+      prevScore = document.createElement('p');
+      prevScore.classList.add('user-scores');
+      prevScore.innerText = `${parsedScore[i].initials} - - Score: ${parsedScore[i].highscore} - - Time left: ${parsedScore[i].timeLeft} sec < Current Score`;
+      prevScore.style.color = 'red';
+    } else {
+      // Otherwise just add the score with no special text or styling
+      prevScore = document.createElement('p');
+      prevScore.classList.add('user-scores');
+      prevScore.innerText = `${parsedScore[i].initials} - - Score: ${parsedScore[i].highscore} - - Time left: ${parsedScore[i].timeLeft} sec`;
+    }
+    highscoreSubmission.appendChild(prevScore);
+    i++;
+  }
+
+  // Compare the current stats with the stats in the local storage object
+  if (parsedScore.length < 2) {
+  } else {
+    // Alert the user accordingly based on the conditions
+    currentScore == largestNum
+      ? alert(`You tied with the highest score with ${currentScore} score!`)
+      : '';
+    currentScore > largestNum
+      ? alert(`You achieved the high score of ${score}!`)
+      : '';
+    currentScore < largestNum ? alert('You did not achieve a high score!') : '';
+    currentTime > longestDuration
+      ? alert(
+          `You achieved the longest duration remaining of ${timeLeft} seconds!`
+        )
+      : '';
+  }
+}
+
+// ------ ------ ------ Display the end game result and execute the various conditions
+function displayResults() {
+  generateEndgameEl();
 
   // Everything below handles the form handling and submission
   var initials = document.getElementById('initials');
@@ -534,41 +584,7 @@ function displayResults() {
         return b['highscore'] - a['highscore'];
       });
 
-      // Then after the sorting, generate the elements and add them to the score container
-      for (let i = 0; i < parsedScore.length; ) {
-        // Add a specific color and text to the most current score
-        if (parsedScore[i].id == id) {
-          prevScore = document.createElement('p');
-          prevScore.classList.add('user-scores');
-          prevScore.innerText = `${parsedScore[i].initials} - - Score: ${parsedScore[i].highscore} - - Time left: ${parsedScore[i].timeLeft} sec < Current Score`;
-          prevScore.style.color = 'red';
-        } else {
-          // Otherwise just add the score with no special text or styling
-          prevScore = document.createElement('p');
-          prevScore.classList.add('user-scores');
-          prevScore.innerText = `${parsedScore[i].initials} - - Score: ${parsedScore[i].highscore} - - Time left: ${parsedScore[i].timeLeft} sec`;
-        }
-        highscoreSubmission.appendChild(prevScore);
-        i++;
-      }
-
-      // Compare the current stats with the stats in the local storage object
-      if (parsedScore.length < 2) {
-      } else {
-        // Alert the user accordingly based on the conditions
-        currentScore == largestNum
-          ? alert(`You tied with the highest score with ${currentScore} score!`)
-          : '';
-        currentScore > largestNum
-          ? alert(`You achieved the high score of ${score}`)
-          : '';
-        currentScore < largestNum
-          ? alert('You did not achieve a high score!')
-          : '';
-        currentTime > longestDuration
-          ? alert(`You achieved the longest duration remaining of ${timeLeft}!`)
-          : '';
-      }
+      displayHighscore(id, longestDuration, largestNum, highscoreSubmission);
 
       initials.value = ''; // Reset value
     }
