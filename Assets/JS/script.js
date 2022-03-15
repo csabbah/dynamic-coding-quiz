@@ -1,8 +1,9 @@
 // Carlos Sabbah - Quiz Challenge - March 14th 2022
 
 // TO DOS
-// - Inform the user via alert if they beat their high score
 // - Update questions and make sure there are 10
+// - Clean up JS (Create more functions) and CSS code as much as possible
+// - Update description and add deployed link in MD
 // Global variables ------ ------ ------ ------ ------ ------ ------ ------ ------ ------
 
 var questions = [
@@ -399,10 +400,6 @@ function displayResults() {
   </div>
   </div>`;
 
-  // - Inform the the user if they beat a high score via alert (extract that data from local storage)
-  //      - If local storage doesn't exist, add a score of 0 so there's something to compare it with
-  //      - If you get stuck on tracking local high score, refer to the robot gladiator project
-  // - Allow user to input their initials so we can submit score to local storage
   // Hide the timer since we are in the results phase
   var timerEl = document.querySelector('.timer');
   timerEl.classList.add('hidden');
@@ -482,13 +479,26 @@ function displayResults() {
       postSubmitEl.style.display = 'flex';
       form.style.display = 'none';
 
-      // This adds the score from the local array to the local storage
+      // Extract the largest number from the local storage BEFORE we store the current value
+      if (storedScores < 1) {
+      } else {
+        var largestNum = parsedScore.reduce(
+          (num1, num2) =>
+            (num1 = num1 > num2.highscore ? num1 : num2.highscore),
+          0
+        );
+      }
+
+      // This adds the score and initials to the local storage
       saveScore(initials.value, score);
 
       // We then parse the local storage data
       var localScore = localStorage.getItem('scores');
       parsedScore = JSON.parse(localScore);
-      current = initials.value;
+
+      // Save the initial of the current score so we can track when it pops up in the for loop
+      currentInitial = initials.value;
+      currentScore = score;
       // Sort the object from high to low (based on the score value)
       parsedScore.sort(function (a, b) {
         return b['highscore'] - a['highscore'];
@@ -496,17 +506,31 @@ function displayResults() {
 
       // Then after the sorting, generate the elements and add them to the score container
       for (let i = 0; i < parsedScore.length; ) {
-        // Add a specific color and text to the most current score
-        if (parsedScore[i].initials == current) {
+        // Add a specific color and text to the most current score with the matching initial
+        if (
+          parsedScore[i].initials == currentInitial &&
+          parsedScore[i].highscore == currentScore
+        ) {
           prevScore = document.createElement('p');
           prevScore.innerText = `${parsedScore[i].initials} - ${parsedScore[i].highscore} < Current Score`;
           prevScore.style.color = 'red';
         } else {
           prevScore = document.createElement('p');
-          prevScore.innerText = `test ${parsedScore[i].initials} - ${parsedScore[i].highscore}`;
+          prevScore.innerText = `${parsedScore[i].initials} - ${parsedScore[i].highscore}`;
         }
         highscoreSubmission.appendChild(prevScore);
         i++;
+      }
+
+      // Compare the current score with the highest score in the local storage object
+      if (parsedScore.length < 2) {
+      } else {
+        // Alert the user accordingly
+        if (currentScore > largestNum) {
+          alert(`You achieved the high score of ${score}`);
+        } else {
+          alert('You did not achieve a high score!');
+        }
       }
 
       initials.value = ''; // Reset value
@@ -601,10 +625,10 @@ var startQuiz = document.getElementById('start-quiz');
 handleHighscore();
 
 // This will execute upon first application load...
-// Then the functions in displayResults() will from then on
+// Then the functions in displayResults() will execute from then on
 startQuiz.addEventListener('click', () => {
   mainHighscoreEl.style.display = 'none'; // When the quiz starts, hide the highscore element
-  // so it doesn't disrupt the layout. We will re-display it upon end game
+  // so it doesn't disrupt the layout. It will re-display upon end game
 
   // Remove intro screen and...
   introEl.remove();
