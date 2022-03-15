@@ -87,6 +87,7 @@ function returnLocalScore() {
         tempVal = {
           initials: item.initials,
           highscore: item.highscore,
+          id: item.Id,
         };
         storedScores.push(tempVal);
       }
@@ -94,10 +95,11 @@ function returnLocalScore() {
   }
 }
 // Save the score to both the array and the local storage
-function saveScore(initialVal, scoreVal) {
+function saveScore(initialVal, scoreVal, Id) {
   tempVal = {
     initials: initialVal,
     highscore: scoreVal,
+    id: Id,
   };
   storedScores.push(tempVal);
   localStorage.setItem('scores', JSON.stringify(storedScores));
@@ -489,16 +491,20 @@ function displayResults() {
         );
       }
 
+      // Assign a unique ID to each score for easy reference
+      // We also refer to this ID when checking for the current score on the leader board
+      var id = Math.ceil(Math.random(1) * 100000);
+
       // This adds the score and initials to the local storage
-      saveScore(initials.value, score);
+      saveScore(initials.value, score, id);
 
       // We then parse the local storage data
       var localScore = localStorage.getItem('scores');
       parsedScore = JSON.parse(localScore);
 
-      // Save the initial of the current score so we can track when it pops up in the for loop
-      currentInitial = initials.value;
+      // Save the current score so we can compare it with the other scores
       currentScore = score;
+
       // Sort the object from high to low (based on the score value)
       parsedScore.sort(function (a, b) {
         return b['highscore'] - a['highscore'];
@@ -506,15 +512,13 @@ function displayResults() {
 
       // Then after the sorting, generate the elements and add them to the score container
       for (let i = 0; i < parsedScore.length; ) {
-        // Add a specific color and text to the most current score with the matching initial
-        if (
-          parsedScore[i].initials == currentInitial &&
-          parsedScore[i].highscore == currentScore
-        ) {
+        // Add a specific color and text to the most current score
+        if (parsedScore[i].id == id) {
           prevScore = document.createElement('p');
           prevScore.innerText = `${parsedScore[i].initials} - ${parsedScore[i].highscore} < Current Score`;
           prevScore.style.color = 'red';
         } else {
+          // Otherwise just add the score with no special text or styling
           prevScore = document.createElement('p');
           prevScore.innerText = `${parsedScore[i].initials} - ${parsedScore[i].highscore}`;
         }
