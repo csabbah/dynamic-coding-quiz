@@ -1,11 +1,6 @@
 // Carlos Sabbah - Quiz Challenge - March 14th 2022
 
-// TO DOS
-// - Update questions and make sure there are 10
-// - Clean up JS (Create more functions) and CSS code as much as possible
-// - Update description and add deployed link in MD
-// Global variables ------ ------ ------ ------ ------ ------ ------ ------ ------ ------
-
+// ------ ------ ------ Global variables
 var questions = [
   {
     question: 'Commonly used data types do NOT include:',
@@ -67,7 +62,7 @@ quizActive = true;
 runOnce = true;
 var storedScores = [];
 
-// Holds the main page element so we can revert back to this when user clicks no to playing again
+// This will create the main page element so we can revert back to this when user clicks 'no' to playing again
 var mainPageEl = `<div class="timer hidden">60</div>
       <div id="intro-highscore-container">
         <div id="inner-score">
@@ -416,16 +411,16 @@ const returnHome = () => {
 
 // ------ ------ ------ Display the end game result and screen
 function displayResults() {
-  // Here we create the post submission element container
+  // This will create the post submission element container
   var postSubmitEl = `<div class='post-submission-el hidden'> 
-  <div class='play-again'>
-  <p>Want to play again?</p> 
-  <div id='play-again-btns'>
-  <button class='btn btn-action' id='yes'>Yes</button>
-  <button class='btn btn-action' id='no'>No</button>
-  </div>
-  </div>
-  </div>`;
+<div class='play-again'>
+<p>Want to play again?</p> 
+<div id='play-again-btns'>
+<button class='btn btn-action' id='yes'>Yes</button>
+<button class='btn btn-action' id='no'>No</button>
+</div>
+</div>
+</div>`;
 
   // Hide the timer since we are in the results phase
   var timerEl = document.querySelector('.timer');
@@ -511,6 +506,10 @@ function displayResults() {
             (num1 = num1 > num2.highscore ? num1 : num2.highscore),
           0
         );
+        var longestDuration = parsedScore.reduce(
+          (num1, num2) => (num1 = num1 > num2.timeLeft ? num1 : num2.timeLeft),
+          0
+        );
       }
 
       // Assign a unique ID to each score for easy reference
@@ -519,15 +518,16 @@ function displayResults() {
 
       timeLeft += 1; // The time decrements by 1 at this stage so i increment by 1 to account for this
 
+      // Save the current score and time so we can compare it with the other scores
+      currentScore = score;
+      currentTime = timeLeft;
+
       // This adds the score and initials to the local storage
       saveScore(initials.value, score, id, timeLeft);
 
       // We then parse the local storage data
       var localScore = localStorage.getItem('scores');
       parsedScore = JSON.parse(localScore);
-
-      // Save the current score so we can compare it with the other scores
-      currentScore = score;
 
       // Sort the object from high to low (based on the score value)
       parsedScore.sort(function (a, b) {
@@ -552,15 +552,22 @@ function displayResults() {
         i++;
       }
 
-      // Compare the current score with the highest score in the local storage object
+      // Compare the current stats with the stats in the local storage object
       if (parsedScore.length < 2) {
       } else {
-        // Alert the user accordingly
-        if (currentScore > largestNum) {
-          alert(`You achieved the high score of ${score}`);
-        } else {
-          alert('You did not achieve a high score!');
-        }
+        // Alert the user accordingly based on the conditions
+        currentScore == largestNum
+          ? alert(`You tied with the highest score with ${currentScore} score!`)
+          : '';
+        currentScore > largestNum
+          ? alert(`You achieved the high score of ${score}`)
+          : '';
+        currentScore < largestNum
+          ? alert('You did not achieve a high score!')
+          : '';
+        currentTime > longestDuration
+          ? alert(`You achieved the longest duration remaining of ${timeLeft}!`)
+          : '';
       }
 
       initials.value = ''; // Reset value
