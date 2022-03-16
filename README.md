@@ -11,7 +11,7 @@ UofT challenge #4: Web APIs Challenge: Code Quiz. This application will test the
 - JavaScript (Heavy focus on this)
 
 ## Website
-https://csabbah.github.io/rapid-brain-test/
+https://csabbah.github.io/dynamic-coding-quiz/
 
 ## Contribution
 
