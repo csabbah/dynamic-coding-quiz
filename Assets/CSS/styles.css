@@ -47,13 +47,19 @@ main {
   background-color: rgb(255, 0, 255);
 }
 
+.btn.option {
+  font-size: 15px;
+  width: 180px;
+  padding: 9px 0px;
+}
+
 /* -------------- Main container (home page) */
 #main-container {
   margin-top: 100px;
   position: relative;
   display: flex;
   flex-direction: row-reverse;
-  justify-content: space-between;
+  justify-content: center;
   width: 700px;
 }
 
@@ -75,6 +81,31 @@ main {
   margin: 10px 0;
 }
 
+@media (max-width: 740px) {
+  #intro h1 {
+    font-size: 25px;
+  }
+
+  #desc {
+    font-size: 18px;
+  }
+  #main-container {
+    width: 450px;
+  }
+}
+
+@media (max-width: 499px) {
+  #intro h1 {
+    font-size: 20px;
+  }
+
+  #desc {
+    font-size: 14px;
+  }
+  #main-container {
+    width: 300px;
+  }
+}
 /* -------------- Main quiz container */
 #start-quiz {
   width: 110px;
@@ -113,6 +144,19 @@ hr {
   color: red;
   font-size: 30px;
   opacity: 1;
+}
+
+@media (max-width: 499px) {
+  #start-quiz {
+    font-size: 15px;
+    width: 90px;
+    padding: 8px 0;
+    margin: 5px 0;
+  }
+
+  #highscore {
+    font-size: 15px;
+  }
 }
 
 /* -------------- Timer properties */
@@ -244,6 +288,42 @@ hr {
   padding: 8px 0;
 }
 
+@media (max-width: 740px) {
+  #question-label {
+    font-size: 20px;
+  }
+
+  #end-game-header h1 {
+    font-size: 33px;
+  }
+
+  .end-game-header em {
+    font-size: 23px;
+  }
+
+  #submit {
+    margin-top: 15px;
+  }
+}
+
+@media (max-width: 499px) {
+  #question-label {
+    font-size: 18px;
+  }
+
+  #end-game-header h1 {
+    font-size: 30px;
+  }
+
+  .end-game-header em {
+    font-size: 20px;
+  }
+
+  #submit {
+    margin-top: 15px;
+  }
+}
+
 /* -------------- Highscore page */
 #highscore {
   margin-top: 10px;
@@ -279,4 +359,51 @@ hr {
 
 .clear-score {
   margin-top: 10px;
+}
+
+.btn.clear-score,
+.btn.go-back {
+  font-size: 16px;
+  width: 150px;
+  padding: 10px 2px;
+}
+.btn.go-back {
+  margin-left: 5px;
+}
+
+@media (max-width: 740px) {
+  .box,
+  .box-menu {
+    width: 450px;
+  }
+
+  .user-scores {
+    font-size: 17px;
+  }
+}
+
+@media (max-width: 499px) {
+  .box,
+  .box-menu {
+    width: 330px;
+  }
+
+  .user-scores {
+    font-size: 14px;
+  }
+
+  .btn.clear-score,
+  .btn.go-back {
+    font-size: 14px;
+    width: 130px;
+    padding: 10px 0px;
+  }
+
+  #inner-score h1 {
+    font-size: 20px;
+  }
+
+  .score-info {
+    font-size: 15px;
+  }
 }
