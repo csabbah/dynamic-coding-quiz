@@ -611,12 +611,12 @@ const handleHighscore = () => {
   var introEl = document.getElementById('intro');
   var highscoreBtn = document.getElementById('highscore');
   var mainHighscoreEl = document.getElementById('inner-score');
-
+  var main = document.getElementById('main-container');
   highscoreBtn.addEventListener('click', () => {
     // Upon clicking the view highscore button, hide the intro and display the highscore element instead
     introEl.style.display = 'none';
     mainHighscoreEl.style.display = 'unset';
-
+    main.style.justifyContent = 'center';
     var highscoreValues = document.querySelector('.box');
     var clearScore = document.querySelector('.clear-score');
 
